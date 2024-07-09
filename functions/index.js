@@ -1,6 +1,7 @@
+// The Cloud Functions for Firebase SDK to create Cloud Functions and triggers.
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 
-// The Firebase Admin SDK to access the Firebase Realtime Database.
+// The Firebase Admin SDK to access Firestore and Messaging.
 const admin = require('firebase-admin');
 admin.initializeApp();
 
