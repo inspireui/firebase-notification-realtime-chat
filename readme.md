@@ -1,3 +1,6 @@
+> Please use the new source code (v2) for FluxStore 4.2.0 and above. This
+> version is also compatible with the old FluxStore version 4.1.1 and below
+
 # Setup guide
 
 Refer to this link for more information: https://firebase.google.com/docs/functions/get-started?gen=2nd
@@ -95,7 +98,20 @@ i  Writing project information to .firebaserc...
 ```
 </details>
 
-## 4. Deploy the function
+## 4. Testing your function
+### 4.1 Install dependencies
+Run these commands
+```
+cd functions
+npm install
+cd ..
+```
+
+### 4.2 Test your function (Optional)
+You can use this command to test your function `firebase emulators:start`
+Refer to this link: https://firebase.google.com/docs/functions/local-emulator#run_the_emulator_suite
+
+## 5. Deploy the function
 Deploy functions to a production environment
 Run this command to deploy
 ```
