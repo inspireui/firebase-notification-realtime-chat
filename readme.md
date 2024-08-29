@@ -1,3 +1,5 @@
+> This guide and source code is for FluxStore 4.1.1 or earlier
+
 # Setup guide
 
 Refer to this link for more information: https://firebase.google.com/docs/functions/get-started?gen=2nd
