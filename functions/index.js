@@ -32,11 +32,19 @@ exports.pushNotification = onRequest((req, res) => {
                     },
                     token: user.deviceToken,
                     android: {
-                        priority: 'high'
+                        priority: 'high',
+                        notification: {
+                            sound: 'default',
+                        }
                     },
                     apns: {
                         headers: {
                             'apns-priority': '10'
+                        },
+                        payload: {
+                            aps: {
+                                sound: "default"
+                            }
                         }
                     }
                 };
@@ -106,11 +114,19 @@ exports.sendNotification = onDocumentCreated('chatRooms/{roomId}/chatScreen/{mes
                 },
                 tokens: registrationTokens,
                 android: {
-                    priority: 'high'
+                    priority: 'high',
+                    notification: {
+                        sound: 'default',
+                    }
                 },
                 apns: {
                     headers: {
                         'apns-priority': '10'
+                    },
+                    payload: {
+                        aps: {
+                            sound: "default",
+                        }
                     }
                 }
             };
