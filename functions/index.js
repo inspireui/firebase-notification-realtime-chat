@@ -80,8 +80,22 @@ exports.sendNotification = onDocumentCreated('chatRooms/{roomId}/chatScreen/{mes
 
             users.forEach((user) => {
                 const { email, pushToken, unread, langCode } = user;
-                if (email !== sender && pushToken) {
-                    registrationTokens.push(pushToken);
+                if (email !== sender) {
+                    if (pushToken) {
+                        registrationTokens.push(pushToken);
+                    } else {
+                        admin
+                            .firestore()
+                            .collection('users')
+                            .doc(email)
+                            .get()
+                            .then(snapshot => {
+                                if (!snapshot.empty) {
+                                    const user = snapshot.data()
+                                    registrationTokens.push(user.deviceToken);
+                                }
+                            })
+                    }
                 }
             })
 
