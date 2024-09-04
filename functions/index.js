@@ -53,11 +53,11 @@ exports.pushNotification = onRequest((req, res) => {
                     .messaging()
                     .send(messagePayload)
                     .then(response => {
-                        console.log('Successfully sent message:', response)
+                        console.log('Successfully sent message:', JSON.stringify(response));
                         res.json({ success: true })
                     })
                     .catch(error => {
-                        console.log('Error sending message:', error)
+                        console.log('Error sending message:', JSON.stringify(error));
                         res.status(500).send(error);
                     })
             }
@@ -135,9 +135,9 @@ exports.sendNotification = onDocumentCreated('chatRooms/{roomId}/chatScreen/{mes
             console.log(message);
 
             admin.messaging().sendEachForMulticast(message).then((response) => {
-                console.log('Successfully sent message:', response)
+                console.log('Successfully sent message:', JSON.stringify(response));
             }).catch((error) => {
-                console.log('Error sending message:', error)
+                console.log('Error sending message:', JSON.stringify(error));
             });
         }
     });
