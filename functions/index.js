@@ -24,11 +24,12 @@ exports.pushNotification = onRequest((req, res) => {
                 res.status(400).json("Not Found")
             } else {
                 const user = snapshot.data()
+                const { senderName, message } = req.query
 
-                const message = {
+                const messagePayload = {
                     notification: {
-                        title: `You have a message from "${req.query.senderName}"`,
-                        body: req.query.message,
+                        title: senderName ? `You have a message from "${senderName}"` : 'You have a message',
+                        body: message ? message : null,
                     },
                     token: user.deviceToken,
                     android: {
@@ -50,7 +51,7 @@ exports.pushNotification = onRequest((req, res) => {
                 };
                 admin
                     .messaging()
-                    .send(message)
+                    .send(messagePayload)
                     .then(response => {
                         console.log('Successfully sent message:', response)
                         res.json({ success: true })
@@ -110,8 +111,8 @@ exports.sendNotification = onDocumentCreated('chatRooms/{roomId}/chatScreen/{mes
 
             const message = {
                 notification: {
-                    title: `You have a message from "${sender}"`,
-                    body: `${text}`
+                    title: sender ? `You have a message from "${sender}"` : 'You have a message',
+                    body: text ? text : null,
                 },
                 tokens: registrationTokens,
                 android: {
