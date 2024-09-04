@@ -76,7 +76,7 @@ exports.sendNotification = onDocumentCreated('chatRooms/{roomId}/chatScreen/{mes
     const { roomId } = event.params;
     const { text, sender } = snapshot.data();
 
-    admin.firestore().doc('chatRooms/' + roomId).get().then((snapshot) => {
+    admin.firestore().doc('chatRooms/' + roomId).get().then(async (snapshot) => {
         if (!snapshot.exists) {
             console.log("No data associated with the event");
             return;
@@ -86,26 +86,27 @@ exports.sendNotification = onDocumentCreated('chatRooms/{roomId}/chatScreen/{mes
         if (users instanceof Array) {
             var registrationTokens = [];
 
-            users.forEach((user) => {
+            for await (const user of users) {
                 const { email, pushToken, unread, langCode } = user;
                 if (email !== sender) {
                     if (pushToken) {
                         registrationTokens.push(pushToken);
                     } else {
-                        admin
+                        const snapshot = await admin
                             .firestore()
                             .collection('users')
                             .doc(email)
-                            .get()
-                            .then(snapshot => {
-                                if (!snapshot.empty) {
-                                    const user = snapshot.data()
-                                    registrationTokens.push(user.deviceToken);
-                                }
-                            })
+                            .get();
+
+
+                        if (!snapshot.empty) {
+                            const user = snapshot.data();
+                            registrationTokens.push(user.deviceToken);
+                        }
+
                     }
                 }
-            })
+            }
 
             const message = {
                 notification: {
