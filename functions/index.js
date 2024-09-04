@@ -44,7 +44,8 @@ exports.pushNotification = onRequest((req, res) => {
                         },
                         payload: {
                             aps: {
-                                sound: "default"
+                                sound: "default",
+                                badge: 1
                             }
                         }
                     }
@@ -85,13 +86,17 @@ exports.sendNotification = onDocumentCreated('chatRooms/{roomId}/chatScreen/{mes
         const { users } = snapshot.data();
 
         if (users instanceof Array) {
-            var registrationTokens = [];
+            var receivers = [];
 
             for await (const user of users) {
                 const { email, pushToken, unread, langCode } = user;
                 if (email !== sender) {
                     if (pushToken) {
-                        registrationTokens.push(pushToken);
+                        receivers.push({
+                            token: pushToken,
+                            // If `unread` is null or equal 0, set badge to 1
+                            badge: unread ? unread : 1,
+                        });
                     } else {
                         const snapshot = await admin
                             .firestore()
@@ -102,19 +107,28 @@ exports.sendNotification = onDocumentCreated('chatRooms/{roomId}/chatScreen/{mes
 
                         if (!snapshot.empty) {
                             const user = snapshot.data();
-                            registrationTokens.push(user.deviceToken);
+                            receivers.push({
+                                token: user.deviceToken,
+                                badge: unread ? unread : 1,
+                            });
                         }
 
                     }
                 }
             }
 
+            if (receivers.empty) {
+                console.log("No receivers found");
+                return;
+            }
+
+            console.log('Receivers:', JSON.stringify(receivers));
+
             const message = {
                 notification: {
                     title: sender ? `You have a message from "${sender}"` : 'You have a message',
                     body: text ? text : null,
                 },
-                tokens: registrationTokens,
                 android: {
                     priority: 'high',
                     notification: {
@@ -128,13 +142,32 @@ exports.sendNotification = onDocumentCreated('chatRooms/{roomId}/chatScreen/{mes
                     payload: {
                         aps: {
                             sound: "default",
+                            badge: 1
                         }
                     }
                 }
             };
-            console.log(message);
 
-            admin.messaging().sendEachForMulticast(message).then((response) => {
+            const messages = receivers.map((receiver) => {
+                const { token, badge } = receiver;
+                // deepcopy message
+                var copy;
+                if (global.structuredClone)
+                    // In some case, it trhow Error `ReferenceError:
+                    // structuredClone is not defined`. I dunno ^^
+                    copy = structuredClone(message)
+                else
+                    copy = JSON.parse(JSON.stringify(message))
+                // add token to copied message
+                copy.token = token;
+                // add badge to copied message
+                copy.apns.payload.aps.badge = badge;
+                return copy;
+            });
+
+            // console.log('Sending messages:', JSON.stringify(messages));
+
+            admin.messaging().sendEach(messages).then((response) => {
                 console.log('Successfully sent message:', JSON.stringify(response));
             }).catch((error) => {
                 console.log('Error sending message:', JSON.stringify(error));

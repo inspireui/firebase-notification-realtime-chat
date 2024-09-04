@@ -1,6 +1,17 @@
 # Changelog
 
-## 2.0
+## 2.0.1
+
+### Added
+- feat(Notification): support push notification if user never opened chat
+- feat(Notifification): push notification with default sound
+- chore(Log): show detail on console
+- feat(Notifification): push notification with badge [iOS]
+
+### Fixed
+- fix(Notification): show undefined for title or body
+
+## 2.0.0
 
 ### Added
 - Add sample port for emulators to test functions
@@ -13,7 +24,7 @@
 ### Removed 
 - Unused `package.json` file.
 
-## 1.0
+## 1.0.0
 
 ### Added
 - Initial project.
