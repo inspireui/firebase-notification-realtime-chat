@@ -25,6 +25,7 @@ exports.pushNotification = onRequest((req, res) => {
             } else {
                 const user = snapshot.data()
                 const { senderName, message } = req.query
+                const email = req.query.email
 
                 const messagePayload = {
                     notification: {
@@ -36,7 +37,8 @@ exports.pushNotification = onRequest((req, res) => {
                         priority: 'high',
                         notification: {
                             sound: 'default',
-                        }
+                        },
+                        collapseKey: email
                     },
                     apns: {
                         headers: {
@@ -45,11 +47,15 @@ exports.pushNotification = onRequest((req, res) => {
                         payload: {
                             aps: {
                                 sound: "default",
-                                badge: 1
+                                badge: 1,
+                                threadId: email
                             }
                         }
                     }
                 };
+
+                console.log('Sending messages:', JSON.stringify(messagePayload));
+
                 admin
                     .messaging()
                     .send(messagePayload)
@@ -96,6 +102,7 @@ exports.sendNotification = onDocumentCreated('chatRooms/{roomId}/chatScreen/{mes
                             token: pushToken,
                             // If `unread` is null or equal 0, set badge to 1
                             badge: unread ? unread : 1,
+                            email: email
                         });
                     } else {
                         const snapshot = await admin
@@ -110,6 +117,7 @@ exports.sendNotification = onDocumentCreated('chatRooms/{roomId}/chatScreen/{mes
                             receivers.push({
                                 token: user.deviceToken,
                                 badge: unread ? unread : 1,
+                                email: email
                             });
                         }
 
@@ -149,19 +157,27 @@ exports.sendNotification = onDocumentCreated('chatRooms/{roomId}/chatScreen/{mes
             };
 
             const messages = receivers.map((receiver) => {
-                const { token, badge } = receiver;
+                const { token, badge, email } = receiver;
                 // deepcopy message
                 var copy;
-                if (global.structuredClone)
+                if (global.structuredClone) {
                     // In some case, it trhow Error `ReferenceError:
                     // structuredClone is not defined`. I dunno ^^
                     copy = structuredClone(message)
-                else
+                }
+                else {
                     copy = JSON.parse(JSON.stringify(message))
+                }
+
                 // add token to copied message
                 copy.token = token;
                 // add badge to copied message
                 copy.apns.payload.aps.badge = badge;
+                // add collapse key to copied message by email for grouping notifications.
+                copy.android.collapseKey = email;
+                // add threadId to copied message by email for grouping notifications.
+                copy.apns.payload.aps.threadId = email;
+
                 return copy;
             });
 
