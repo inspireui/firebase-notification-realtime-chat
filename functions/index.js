@@ -305,6 +305,7 @@ exports.notifyOnRealtimeChatMessage = onValueCreated(
 
       if (!messageData) {
         // No message data found for messageId
+        console.log(`No message data found for messageId: ${messageId}`);
         return;
       }
 
@@ -319,6 +320,7 @@ exports.notifyOnRealtimeChatMessage = onValueCreated(
 
       if (!conversation_id || !senderId) {
         // Missing required fields: conversation_id or user_id
+        console.log(`Missing required fields for messageId: ${messageId}`);
         return;
       }
 
@@ -332,6 +334,7 @@ exports.notifyOnRealtimeChatMessage = onValueCreated(
 
       if (!chatSessionSnapshot.exists()) {
         // No chat session found for conversation_id
+        console.log(`No chat session found for conversation_id: ${conversation_id}`);
         return;
       }
 
@@ -357,14 +360,15 @@ exports.notifyOnRealtimeChatMessage = onValueCreated(
 
         if (!recipientUserSnapshot.exists()) {
           // No user data found for user_id
+          console.log(`No user data found for user_id: ${recipientUserId}`);
           continue;
         }
 
         const recipientUserData = recipientUserSnapshot.val();
-        if (recipientUserData.pushToken) {
+        if (recipientUserData.push_token) {
           recipients.push({
             userId: recipientUserId,
-            pushToken: recipientUserData.pushToken,
+            pushToken: recipientUserData.push_token,
             userName: recipientUserData.user_name || "User",
             userType: recipientUserData.user_type || "visitor"
           });
@@ -373,6 +377,7 @@ exports.notifyOnRealtimeChatMessage = onValueCreated(
 
       if (recipients.length === 0) {
         // No recipients with push tokens found
+        console.log(`No recipients with push tokens found for conversation_id: ${conversation_id}`);
         return;
       }
 
@@ -423,16 +428,25 @@ exports.notifyOnRealtimeChatMessage = onValueCreated(
       // Send notifications
       const response = await admin
         .messaging()
-        .sendEach(notificationMessages)
-        .then((response) => {
-          console.log(
-            "Successfully sent message:",
-            JSON.stringify(response)
-          );
-        })
-        .catch((error) => {
-          console.log("Error sending message:", JSON.stringify(error));
-        });
+        .sendEach(notificationMessages);
+
+      console.log("Notification results:", {
+        successCount: response.successCount,
+        failureCount: response.failureCount,
+        responses: response.responses.map((resp, index) => ({
+          recipient: recipients[index].userName,
+          success: resp.success,
+          error: resp.error?.message || null
+        }))
+      });
+
+      // Log any failures
+      response.responses.forEach((resp, index) => {
+        if (!resp.success) {
+          console.error(`Failed to send notification to ${recipients[index].userName}:`, resp.error);
+        }
+      });
+
     } catch (error) {
       console.error("Error in notifyOnRealtimeChatMessage:", error);
     }
