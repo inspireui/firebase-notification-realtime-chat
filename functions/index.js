@@ -295,7 +295,7 @@ exports.notifyOnLoyaltyTransactionCreated = onDocumentCreated(
   }
 );
 
-// Realtime Database trigger for chat messages
+// Realtime Database trigger for chat messages (WCFM Live Chat)
 exports.notifyOnRealtimeChatMessage = onValueCreated(
   "chat_messages/{messageId}",
   async (event) => {
