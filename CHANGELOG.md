@@ -1,6 +1,16 @@
 # Changelog
 
-## 2.0.1
+## 2.0.3 - [28-05-2025]
+
+### Added
+- feat(Notification): push notification for WCFM Live Chat
+
+## 2.0.2 - [05-04-2025]
+
+### Added
+- feat(Notification): push notification for loyalty
+
+## 2.0.1 - [04-09-2024]
 
 ### Added
 - feat(Notification): support push notification if user never opened chat
@@ -11,7 +21,7 @@
 ### Fixed
 - fix(Notification): show undefined for title or body
 
-## 2.0.0
+## 2.0.0 - [29-08-2024]
 
 ### Added
 - Add sample port for emulators to test functions
