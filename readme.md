@@ -46,9 +46,9 @@ You may have to answer some questions, just follow the form below
 
 <details>
   <summary markdown="span">The result will look like that</summary>
-  
+
 ```sh
-son@MacBook-Pro-cua-Son firebase-notification-realtime-chat % firebase init functions                     
+son@MacBook-Pro-cua-Son firebase-notification-realtime-chat % firebase init functions
 
      ######## #### ########  ######## ########     ###     ######  ########
      ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
@@ -68,7 +68,7 @@ Before we get started, keep in mind:
 === Project Setup
 
 First, let's associate this project directory with a Firebase project.
-You can create multiple project aliases by running firebase use --add, 
+You can create multiple project aliases by running firebase use --add,
 but for now we'll just set up a default project.
 
 i  Using project flutter-practice-001 (Flutter Paractice test)
@@ -99,7 +99,27 @@ i  Writing project information to .firebaserc...
 </details>
 
 ## 4. Testing your function
-### 4.1 Install dependencies
+### 4.1 Configure push provider environment
+By default, the function sends chat notifications with Firebase Cloud Messaging.
+If your app uses Firebase push tokens, you can skip this step.
+
+If your app uses OneSignal, create your local environment file:
+
+```sh
+cp functions/.env.example functions/.env
+```
+
+Then update `functions/.env` with your OneSignal credentials:
+
+```dotenv
+PUSH_PROVIDER=onesignal
+ONESIGNAL_APP_ID=your-onesignal-app-id
+ONESIGNAL_REST_API_KEY=your-onesignal-rest-api-key
+```
+
+Do not commit `functions/.env`. It contains local credentials and is ignored by Git.
+
+### 4.2 Install dependencies
 Run these commands
 ```
 cd functions
@@ -107,7 +127,7 @@ npm install
 cd ..
 ```
 
-### 4.2 Test your function (Optional)
+### 4.3 Test your function (Optional)
 You can use this command to test your function `firebase emulators:start`
 Refer to this link: https://firebase.google.com/docs/functions/local-emulator#run_the_emulator_suite
 

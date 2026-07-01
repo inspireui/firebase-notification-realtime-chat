@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.4 - [01-07-2026]
+
+### Added
+- feat(Notification): support configurable chat push provider
+
+### Fixed
+- fix(Notification): send chat notifications through OneSignal when configured
+
 ## 2.0.3 - [28-05-2025]
 
 ### Added
@@ -31,7 +39,7 @@
 - Upgrade dependencies: `firebase-admin` and `firebase-functions`.
 - Update `functions/index.js` to use `firebase-function` v2
 
-### Removed 
+### Removed
 - Unused `package.json` file.
 
 ## 1.0.0
